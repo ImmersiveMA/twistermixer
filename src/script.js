@@ -1,13 +1,12 @@
 const sound = document.getElementById("sound");
+const tempLights = document.getElementById("tempLights");
 
 // Sound list:
 const calm = new Audio('./audio/Sweet.mp3');
 const piano = new Audio('./audio/piano.mp3');
 const nature = new Audio('./audio/nature.mp3');
 
-console.log(sound.value);
-
-sound.addEventListener("change", ()=> {
+sound.addEventListener("input", ()=> {
 
     nature.pause();
     calm.pause();
@@ -33,3 +32,30 @@ sound.addEventListener("change", ()=> {
             break;
     }
 });
+
+tempLights.addEventListener("input", () => {
+    switch (tempLights.value) {
+        case "1":
+            request('http://192.168.137.92/lampje?color=green');
+            break;
+        
+        case "2":
+            request('http://192.168.137.92/lampje?color=white');
+            break;
+    
+        case "3":
+            request('http://192.168.137.92/lampje?color=yellow');
+            break;
+        
+        default:
+
+            console.log("lights it brokey");
+            break;
+    }
+});
+
+function request(url) {
+    const http = new XMLHttpRequest();
+    http.open("GET", url);
+    http.send();
+}
