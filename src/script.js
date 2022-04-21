@@ -1,26 +1,39 @@
 const sound = document.getElementById("sound");
-const tempLights = document.getElementById("tempLights");
 const color1 = document.getElementById('color1');
 const color2 = document.getElementById('color2');
+const brightness = document.getElementById('brightness');
 
+
+// controller urls:
+const paal = "http://192.168.137.20";
+const flower1 = "http://192.168.137.32";
+const flower2 = "http://192.168.137.52";
+const flower3 = "http://192.168.137.254";
 
 // Sound list:
 const calm = new Audio('./audio/Sweet.mp3');
 const piano = new Audio('./audio/piano.mp3');
 const nature = new Audio('./audio/nature.mp3');
+const ocean = new Audio('./audio/ocean.mp3');
+
+calm.loop = true;
+piano.loop = true;
+nature.loop = true;
+ocean.loop = true;
 
 sound.addEventListener("input", ()=> {
 
     nature.pause();
     calm.pause();
     piano.pause();
+    ocean.pause();
 
     switch (sound.value) {
         case "1":
             nature.play();
             break;
         
-        case "2":
+        case "4":
             calm.play();
             console.log("liedje calm")
             break;
@@ -29,30 +42,13 @@ sound.addEventListener("input", ()=> {
             piano.play();
             break;
         
+        case "2":
+            ocean.play();
+            break;
+
         default:
 
             console.log("it brokey");
-            break;
-    }
-});
-
-tempLights.addEventListener("input", () => {
-    switch (tempLights.value) {
-        case "1":
-            request('http://192.168.137.92/lampje?color=green');
-            break;
-        
-        case "2":
-            request('http://192.168.137.92/lampje?color=white');
-            break;
-    
-        case "3":
-            request('http://192.168.137.92/lampje?color=yellow');
-            break;
-        
-        default:
-
-            console.log("lights it brokey");
             break;
     }
 });
@@ -63,8 +59,6 @@ function request(url) {
     http.send();
 }
 
-
-
 let delay = 100;
 let cantSend = true;
 let cantSend2 = true;
@@ -72,12 +66,13 @@ let cantSend2 = true;
 color2.addEventListener('input', () => {
     
     color = getColor(color2.value);
-    showcase.style.backgroundColor = `rgb( ${color.red}, ${color.green}, ${color.blue})`;
 
     if(!cantSend2) return;
     cantSend2 = false;
 
-    request(`http://192.168.137.15/color?r=${color.red}&g=${color.green}&b=${color.blue}`);
+    try {
+        request(`${paal}/color?r=${color.red}&g=${color.green}&b=${color.blue}`);
+    } catch (error) {}
 
     setTimeout(() => {
         cantSend2 = true;
@@ -91,17 +86,33 @@ color1.addEventListener('input', () => {
 
     if(!cantSend) return;
     cantSend = false;
-    request(`http://192.168.137.168/color?r=${color.red}&g=${color.green}&b=${color.blue}`);
-    request(`http://192.168.137.190/color?r=${color.red}&g=${color.green}&b=${color.blue}`);
-    request(`http://192.168.137.37/color?r=${color.red}&g=${color.green}&b=${color.blue}`);
-
-    console.log(color1.value, `r=${color.red},g=${color.green},b=${color.blue}`)
+    try {
+        request(`${flower1}/color?r=${color.red}&g=${color.green}&b=${color.blue}`);
+        request(`${flower2}/color?r=${color.red}&g=${color.green}&b=${color.blue}`);
+        request(`${flower3}/color?r=${color.red}&g=${color.green}&b=${color.blue}`);   
+    } catch (error) {}
 
     setTimeout(() => {
         cantSend = true;
     }, delay);
 
 });
+
+let cantSend3 = true
+
+brightness.addEventListener('input', () => {
+    if(!cantSend3) return;
+    cantSend3 = false;
+
+    try {
+        request(`${paal}/brightness?b=${brightness.value}`);
+    } catch (error) {}
+
+    setTimeout(() => {
+        cantSend3 = true;
+    }, delay);
+});
+
 
 function getColor (color) {
     let green;
@@ -168,3 +179,7 @@ function getColor (color) {
     colorobj.blue = blue;
     return colorobj;
 }
+
+document.body.addEventListener('touchstart', e => {
+    e.preventDefault();
+});
